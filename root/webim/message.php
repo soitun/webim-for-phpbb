@@ -1,6 +1,6 @@
 <?php 
 include_once('common.php');
-$ticket = p("ticket");
+
 $type = p("type");
 $offline = p("offline");
 $to = p("to");

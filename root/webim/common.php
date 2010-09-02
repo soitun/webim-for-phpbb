@@ -2,6 +2,7 @@
 define('IN_PHPBB', true);
 require_once('lib/webim.class.php');
 $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : '../';
+
 $phpEx = substr(strrchr(__FILE__, '.'), 1);
 include($phpbb_root_path . 'common.' . $phpEx);
 require_once("lib/json.php");
@@ -10,11 +11,12 @@ $auth->acl($user->data);
 error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 $user_data=$user->data;
 unset($user);
+
 $user->uid = $user_data['user_id'];
 $user->id = $user_data['username'];
 $user->nick = $user_data['username'];
-$user->pic_url = im_avatar();
-$user->default_pic_url=im_avatar();
+$user->pic_url =  im_avatar($user_data);
+$user->default_pic_url="./styles/prosilver/theme/images/no_avatar.gif";
 $user->group_id=$user_data['group_id'];
 $user->show = gp('show') ? gp('show') : "available";
 $user->url = "memberlist.php?mode=viewprofile&u=".$user->uid;
@@ -25,12 +27,10 @@ $ticket = str_replace(array('\\', '//'), '/', $ticket);
 }
 
 
-function im_avatar(){
-global $phpbb_root_path,$user;
-return "http://localhost/phpbb/webim/static/images/noavatar_small.gif";
-//return $phpbb_root_path."/webim/static/images/noavatar_small.gif";
+function im_avatar($user_data){
+$user_img=get_user_avatar($user_data['user_avatar'],$user_data['user_avatar_type'],$user_data['user_avatar_width'],$user_data['user_avatar_height']);
+return (!empty($user_img) ? $user_img : "./webim/static/images/noavatar_small.gif");
 }
-
 //$db->query("SET NAMES utf8");
 //$groups = getfriendgroup();
 //foreach($groups as $k => $v){
@@ -66,7 +66,7 @@ function online_buddy(){
         $update_time = $config['load_online_time'] * 60;
 
         $sql = $db->sql_build_query('SELECT_DISTINCT', array(
-		'SELECT'	=> 'u.user_id, u.username, u.username_clean, u.user_colour, MAX(s.session_time) as online_time, MIN(s.session_viewonline) AS viewonline',
+		'SELECT'	=> 'u.user_id, u.user_avatar,u.user_avatar_type,u.user_avatar_width,u.user_avatar_height,u.username, u.username_clean, u.user_colour, MAX(s.session_time) as online_time, MIN(s.session_viewonline) AS viewonline',
 
 		'FROM'		=> array(
 			USERS_TABLE		=> 'u',
@@ -98,8 +98,8 @@ function online_buddy(){
 			"nick" => $value['username'],
 			//"group" => $value['group_id'],
 			"url" => "memberlist.php?mode=viewprofile&u=".$value['user_id'],
-			'default_pic_url' => im_avatar(),
-			"pic_url" => im_avatar()
+			'default_pic_url' => im_avatar($value),
+			"pic_url" =>im_avatar($value)
 		);
                 }
 	}
@@ -132,7 +132,7 @@ function buddy($ids) {
 	if(empty($ids))return array();
 	$ids = join("','", $ids);
 	$buddies = array();
-	$q="SELECT main.user_id, main.username, main.username_clean, f.zebra_id FROM "
+	$q="SELECT main.user_id, main.username,  main.user_avatar,main.user_avatar_type,main.user_avatar_width,main.user_avatar_height,main.username_clean, f.zebra_id FROM "
 		.USERS_TABLE
 		." main LEFT OUTER JOIN "
 		.ZEBRA_TABLE
@@ -152,12 +152,12 @@ function buddy($ids) {
 		$buddies[]=(object)array('uid'=>$id,
 			'id'=> $nick,
 			'nick'=> $nick,
-			'pic_url' =>im_avatar(),
+			'pic_url' =>im_avatar($value),
 			'status'=>'' ,
 			'status_time'=>'',
 			'url'=>"memberlist.php?mode=viewprofile&u=".$value['user_id'],
 			'group'=> $group,
-			'default_pic_url' =>im_avatar());
+			'default_pic_url' =>im_avatar($value));
 	}
          $db->sql_freeresult($result);
 	return $buddies;
@@ -276,6 +276,60 @@ function setting() {
 		$setting = $setting["web"];
 	}
 	return json_decode(empty($setting) ? "{}" : $setting);
+}
+
+/**
+* Get user avatar
+*
+* @param string $avatar Users assigned avatar name
+* @param int $avatar_type Type of avatar
+* @param string $avatar_width Width of users avatar
+* @param string $avatar_height Height of users avatar
+* @param string $alt Optional language string for alt tag within image, can be a language key or text
+* @param bool $ignore_config Ignores the config-setting, to be still able to view the avatar in the UCP
+*
+* @return string Avatar image
+*/
+function get_user_avatar($avatar, $avatar_type, $avatar_width, $avatar_height, $alt = 'USER_AVATAR', $ignore_config = false)
+{
+	global $user, $config, $phpbb_root_path, $phpEx;
+
+	if (empty($avatar) || !$avatar_type || (!$config['allow_avatar'] && !$ignore_config))
+	{
+		return '';
+	}
+
+	$avatar_img = '';
+
+	switch ($avatar_type)
+	{
+		case AVATAR_UPLOAD:
+			if (!$config['allow_avatar_upload'] && !$ignore_config)
+			{
+				return '';
+			}
+			$avatar_img = "download/file.$phpEx?avatar=";
+		break;
+
+		case AVATAR_GALLERY:
+			if (!$config['allow_avatar_local'] && !$ignore_config)
+			{
+				return '';
+			}
+			$avatar_img =  $config['avatar_gallery_path'] . '/';
+		break;
+
+		case AVATAR_REMOTE:
+			if (!$config['allow_avatar_remote'] && !$ignore_config)
+			{
+				return '';
+			}
+		break;
+	}
+
+	$avatar_img .= $avatar;
+//	return '<img src="' . (str_replace(' ', '%20', $avatar_img)) . '" width="' . $avatar_width . '" height="' . $avatar_height . '" alt="' . ((!empty($user->lang[$alt])) ? $user->lang[$alt] : $alt) . '" />';
+return str_replace(' ', '%20', $avatar_img);
 }
 
 //function to_utf8($s) {

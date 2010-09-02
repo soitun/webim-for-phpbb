@@ -1,12 +1,11 @@
 <?php
-
 include_once('common.php');
+
 $im = new WebIM($user, null, $_IMC['domain'], $_IMC['apikey'], $_IMC['host'], $_IMC['port']);
 
 $im_buddies = array();//For online.
 $im_rooms = array();//For online.
 
-$strangers = ids_array(gp('stranger_ids'));
 
 $cache_buddies = array();//For find.
 //$cache_rooms = array();//For find.
@@ -45,8 +44,8 @@ foreach($active_buddies as $k => $v){
 	}
 }
 
-if(!empty($buddies_without_info) || !empty($strangers)){
-	foreach(buddy(implode(",", $buddies_without_info), implode(",", $strangers)) as $k => $v){
+if(!empty($buddies_without_info)){
+	foreach(buddy(implode(",", $buddies_without_info)) as $k => $v){
 		$id = $v->id;
 		$im_buddies[] = $id;
 		$v->presence = "offline";
