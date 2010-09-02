@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="modx.prosilver.xsl" type="text/xsl" ?>
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns="http://www.phpbb.com/mods/xml/modx-1.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:ns="http://www.phpbb.com/mods/xml/modx-1.0.xsd">
+    <header>
+        <license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
+        <title lang="en-GB">NIXTIM</title>
+        <description lang="en-GB">社区网站即时通讯插件</description>
+        <author-notes lang="en-GB">安装完成后，删除cache目录下的所有文件,清除模板缓存.
+        NIXTIM 3.0所需的apikey可以从www.webim20.cn注册获取，你可以在phpbb根目录下的webim/config.php中设置域名,apikey及各种主题。
+        欢迎使用NIXTIM 3.0！
+        </author-notes>
+
+        <author-group>
+            <author>
+                <username>opengoss</username>
+                <realname>NXITIM研发团队</realname>
+                <homepage>http://www.webim20.cn</homepage>
+                <email>webim20@gmail.com</email>
+            </author>
+        </author-group>
+
+        <mod-version>
+            <major>3</major>
+            <minor>0</minor>
+            <revision>0</revision>
+        </mod-version>
+
+        <installation>
+            <level>easy</level>
+            <time>200</time>
+            <target-version>
+                <target-primary>3.0 RC4</target-primary>
+                <target-major allow="exact">3</target-major>
+                <target-minor allow="exact">0</target-minor>
+                <target-revision allow="exact">RC4</target-revision>
+            </target-version>
+        </installation>
+
+        <!--<history>
+      <entry>
+        <date>2007-06-03</date>
+        <rev-version>
+          <major>0</major>
+          <minor>1</minor>
+          <revision>0</revision>
+        </rev-version>
+        <changelog lang="en-GB">
+          <change>First relase</change>
+        </changelog>
+      </entry>
+
+      <entry>
+        <date>2007-06-04</date>
+        <rev-version>
+          <major>0</major>
+          <minor>1</minor>
+          <revision>1</revision>
+        </rev-version>
+        <changelog lang="en-GB">
+          <change>Added english language</change>
+          <change>Fixed a Bug with Banner output</change>
+        </changelog>
+      </entry>
+
+      <entry>
+        <date>2007-06-05</date>
+        <rev-version>
+          <major>0</major>
+          <minor>1</minor>
+          <revision>2</revision>
+        </rev-version>
+        <changelog lang="en-GB">
+          <change>Added max views</change>
+          <change>Fixed some Bugs</change>
+        </changelog>
+      </entry>
+
+      <entry>
+        <date>2007-07-30</date>
+        <rev-version>
+          <major>0</major>
+          <minor>1</minor>
+          <revision>3</revision>
+        </rev-version>
+        <changelog lang="en-GB">
+          <change>Fixed some Bugs</change>
+        </changelog>
+      </entry>
+
+      <entry>
+        <date>2007-08-14</date>
+        <rev-version>
+          <major>0</major>
+          <minor>1</minor>
+          <revision>4</revision>
+        </rev-version>
+        <changelog lang="en-GB">
+          <change>Fixed Bug with output in specific forums</change>
+          <change>Added forgotten language variable</change>
+        </changelog>
+      </entry>
+
+
+    </history>-->
+    </header>
+
+    <action-group>
+        <copy>
+            <file from="root/styles/prosilver/template/webim_phpbb.htm" to="styles/prosilver/template/webim_phpbb.htm" />
+            <file from="root/webim/*.*" to="webim/*.*" />
+        </copy>
+
+        <sql><![CDATA[/*Remove the old version of 'webim_setting', rename it to 'webim_settings'*/
+DROP TABLE IF EXISTS webim_setting;
+
+/*Direct clear histories when re install or upgrade*/
+DROP TABLE IF EXISTS webim_histories;
+
+CREATE TABLE webim_histories (
+        `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+        `send` tinyint(1) DEFAULT NULL,
+        `type` varchar(20) DEFAULT NULL,
+        `to` varchar(20) DEFAULT NULL,
+        `from` varchar(20) DEFAULT NULL,
+        `nick` varchar(20) DEFAULT NULL COMMENT 'from nick',
+        `body` text,
+        `style` varchar(150) DEFAULT NULL,
+        `timestamp` double DEFAULT NULL,
+        `todel` tinyint(1) NOT NULL DEFAULT '0',
+        `fromdel` tinyint(1) NOT NULL DEFAULT '0',
+        `created_at` date DEFAULT NULL,
+        `updated_at` date DEFAULT NULL,
+        PRIMARY KEY (`id`),
+        KEY `todel` (`todel`),
+        KEY `fromdel` (`fromdel`),
+        KEY `timestamp` (`timestamp`),
+        KEY `to` (`to`),
+        KEY `from` (`from`),
+        KEY `send` (`send`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS webim_settings(
+        `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+        `uid` mediumint(8) unsigned NOT NULL,
+        `web` blob,
+        `air` blob,
+        `created_at` date DEFAULT NULL,
+        `updated_at` date DEFAULT NULL,
+        PRIMARY KEY (`id`) 
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
+        ]]></sql>
+
+
+        <open src="config.php">
+            <edit>
+                <find><![CDATA[@define('PHPBB_INSTALLED', true);]]></find>
+                <action type="after-add"><![CDATA[include_once 'webim/config.php';]]></action>
+            </edit>
+        </open>
+
+
+        <open src=" styles/prosilver/template/overall_footer.html">
+            <edit>
+                <find><![CDATA[	</body> ]]></find>
+                <action type="before-add"><![CDATA[<!-- INCLUDE webim_phpbb.htm -->]]></action>
+            </edit>
+        </open>
+
+
+        <open src="includes/functions.php">
+            <edit>
+                <find><![CDATA[function page_footer($run_cron = true){]]></find>
+                <action type="after-add"><![CDATA[global $_IMC;]]></action>
+
+
+                <find><![CDATA[$template->assign_vars(array(
+		'DEBUG_OUTPUT'			=> (defined('DEBUG')) ? $debug_output : '',
+		'TRANSLATION_INFO'		=> (!empty($user->lang['TRANSLATION_INFO'])) ? $user->lang['TRANSLATION_INFO'] : '',]]></find>
+                <action type="after-add"><![CDATA[
+                'S_ENABLE_IM'=>$_IMC['enable'],
+                'S_USER_LOGGED_IN'=> ($user->data['user_id'] != ANONYMOUS) ? true : false,
+                'IM_THEME'=>$_IMC['theme'],
+                'IM_LOCAL'=>$_IMC['local'],]]></action>
+            </edit>
+        </open>
+
+    </action-group>
+</mod>
