@@ -7,8 +7,9 @@
         <license>http://opensource.org/licenses/gpl-license.php GNU General Public License v2</license>
         <title lang="en-GB">NIXTIM</title>
         <description lang="en-GB">社区网站即时通讯插件</description>
-        <author-notes lang="en-GB">1.安装完成后，删除cache目录下的所有文件,清除模板缓存.
-        2.NIXTIM 3.0所需的apikey可以从www.webim20.cn注册获取，你需要在phpbb根目录下的webim/config.php中设置域名,apikey及各种主题。
+        <author-notes lang="en-GB">1.安装完成后，删除cache目录下的所有文件,清除模板缓存。
+        2.在www.webim20.cn注册站点，获取apikey。
+        3.更改phpbb根目录下webim/config.php中的域名(domain),apikey及各种主题。
 
         欢迎使用NIXTIM 3.0！
         </author-notes>
