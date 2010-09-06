@@ -2,11 +2,11 @@
 header("Content-type: application/javascript");
 include_once('common.php');
 $menu = array(
-	array("title" => 'doing',"icon" =>"image/app/doing.gif","link" => "space.php?do=doing"),
-	array("title" => 'album',"icon" =>"image/app/album.gif","link" => "space.php?do=album"),
-	array("title" => 'blog',"icon" =>"image/app/blog.gif","link" => "space.php?do=blog"),
-	array("title" => 'thread',"icon" =>"image/app/mtag.gif","link" => "space.php?do=thread"),
-	array("title" => 'share',"icon" =>"image/app/share.gif","link" => "space.php?do=share")
+//	array("title" => 'doing',"icon" =>"image/app/doing.gif","link" => "space.php?do=doing"),
+//	array("title" => 'album',"icon" =>"image/app/album.gif","link" => "space.php?do=album"),
+//	array("title" => 'blog',"icon" =>"image/app/blog.gif","link" => "space.php?do=blog"),
+//	array("title" => 'thread',"icon" =>"image/app/mtag.gif","link" => "space.php?do=thread"),
+//	array("title" => 'share',"icon" =>"image/app/share.gif","link" => "space.php?do=share")
 );
 
 //if($_SCONFIG['my_status']) {
