@@ -1387,7 +1387,7 @@ function mod_doKeyPress(e)
     <dl class="author-info">
       <dt id="lang-a-un[{generate-id()}]">Username:</dt>
 			<dd>
-				<a href="http://www.phpbb.com/phpBB/profile.php?mode=viewprofile&amp;un={mod:username}">
+                          <a href="http://www.opengoss.com">
 					<xsl:value-of select="mod:username" />
 				</a>
 			</dd>
